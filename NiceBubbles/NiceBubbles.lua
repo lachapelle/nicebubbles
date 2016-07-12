@@ -1,7 +1,7 @@
 local ADDON = ...
 
 -- Lua API
-local abs, floor = math.abs, math.floor
+local abs, floor, min, max = math.abs, math.floor, math.min, math.max
 local ipairs, pairs, select = ipairs, pairs, select
 local tostring = tostring
 
@@ -13,7 +13,7 @@ local WorldFrame = WorldFrame
 -- Bubble Data
 local bubbles = {} -- local bubble registry
 local numChildren, numBubbles = -1, 0 -- bubble counters
-local fontsize = 12 -- bubble font size
+local minsize, maxsize, fontsize = 12, 16, 12 -- bubble font size
 local offsetX, offsetY = 0, -100 -- bubble offset from its original position
 
 -- Textures
@@ -194,7 +194,10 @@ Updater.InitBubble = function(self, bubble)
 end
 
 Updater.UpdateBubbleSize = function(self, bubble)
+	local space = getPadding()
 	bubbles[bubble].text:SetFont(ChatFontNormal:GetFont(), fontsize, "")
+	bubbles[bubble].text:ClearAllPoints()
+	bubbles[bubble].text:SetPoint("BOTTOMLEFT", space, space)
 end
 
 
@@ -215,6 +218,7 @@ NiceBubbles:SetScript("OnEvent", function(self, event, ...)
 		
 		hooksecurefunc(ChatFrame1, "SetFont", function() 
 			local _, newsize = ChatFrame1:GetFont()
+			newsize = min(max(newsize - 1, minsize), maxsize)
 			if newsize ~= fontsize then
 				fontsize = newsize
 				for bubble in pairs(bubbles) do
