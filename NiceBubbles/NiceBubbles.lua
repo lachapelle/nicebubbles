@@ -60,10 +60,13 @@ Updater:SetFrameStrata("TOOLTIP") -- higher strata is called last
 
 -- check whether the given frame is a bubble or not
 Updater.IsBubble = function(self, bubble)
-	if bubble:GetName() or not bubble:GetRegions() then 
+	local name = bubble.GetName and bubble:GetName()
+	local region = bubble.GetRegions and bubble:GetRegions()
+	if name or not region then 
 		return 
 	end
-	return bubble:GetRegions():GetTexture() == BUBBLE_TEXTURE
+	local texture = region.GetTexture and region:GetTexture()
+	return texture and texture == BUBBLE_TEXTURE
 end
 
 Updater.OnUpdate = function(self, elapsed)
