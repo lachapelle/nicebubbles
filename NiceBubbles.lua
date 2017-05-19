@@ -1,14 +1,18 @@
 local ADDON = ...
 
 -- Lua API
-local abs, floor, min, max = math.abs, math.floor, math.min, math.max
-local ipairs, pairs, select = ipairs, pairs, select
+local _G = _G
+
+local ipairs = ipairs
+local math_abs = math.abs
+local math_floor = math.floor
+local pairs = pairs
+local select = select
 local tostring = tostring
 
 -- WoW API
-local CreateFrame = CreateFrame
-local hooksecurefunc = hooksecurefunc
-local WorldFrame = WorldFrame
+local CreateFrame = _G.CreateFrame
+local WorldFrame = _G.WorldFrame
 
 -- Bubble Data
 local bubbles = {} -- local bubble registry
@@ -21,6 +25,8 @@ local BLANK_TEXTURE = [[Interface\ChatFrame\ChatFrameBackground]]
 local BUBBLE_TEXTURE = [[Interface\Tooltips\ChatBubble-Background]]
 local TOOLTIP_BORDER = [[Interface\Tooltips\UI-Tooltip-Border]]
 
+-- Client version constant
+local ENGINE_LEGION = tonumber((select(2, GetBuildInfo()))) >= 24015 -- 7.2.0 May 18th 2017
 
 ------------------------------------------------------------------------------
 -- 	Utitlity Functions
@@ -60,6 +66,13 @@ Updater:SetFrameStrata("TOOLTIP") -- higher strata is called last
 
 -- check whether the given frame is a bubble or not
 Updater.IsBubble = function(self, bubble)
+	-- Friendly NPC nameplates in instances can't be touched at all, 
+	-- even calling their standard frame methods will cause a taint and error. 
+	-- So to avoid that, we have to avoid calling methods on anything that
+	-- potentially could be a Legion nameplate. 
+	if ENGINE_LEGION and bubble.UnitFrame then
+		return 
+	end
 	local name = bubble.GetName and bubble:GetName()
 	local region = bubble.GetRegions and bubble:GetRegions()
 	if name or not region then 
