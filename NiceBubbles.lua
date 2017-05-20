@@ -26,7 +26,10 @@ local BUBBLE_TEXTURE = [[Interface\Tooltips\ChatBubble-Background]]
 local TOOLTIP_BORDER = [[Interface\Tooltips\UI-Tooltip-Border]]
 
 -- Client version constant
-local ENGINE_LEGION = tonumber((select(2, GetBuildInfo()))) >= 24015 -- 7.2.0 May 18th 2017
+-- Patch versions: http://wow.gamepedia.com/Public_client_builds
+-- 24015 - most recent 7.2.0
+-- 23436 - oldest 7.2.0
+local ENGINE_LEGION = tonumber((select(2, GetBuildInfo()))) >= 23436
 
 ------------------------------------------------------------------------------
 -- 	Utitlity Functions

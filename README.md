@@ -4,8 +4,6 @@ This is an addon that styles the chat bubbles appearing in the game world to be 
 
 The idea is to clear up screen space while still having the bubbles visible, so you can pay attention to both what is happening and to what people and NPCs are saying, without having your eyes going ping pong back and forth from the screen and chat frame.
 
-Look at the screenshot to see the addon in action, as it shows an example of a restyled chat bubble from a monster attacking the player.
-
 ## Join the community
 
 There are thousands of users, but most are content to simply download and use my addons without further ado. If you wish to get more involved though, have some questions you can't find answers to anywhere else or simply just wish to stop by and say hello, we have both a [discord](https://discordapp.com/) server and a facebook page.
