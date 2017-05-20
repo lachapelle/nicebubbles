@@ -1,4 +1,4 @@
-local ADDON = ...
+local ADDON = "NiceBubbles"
 
 -- Lua API
 local _G = _G
