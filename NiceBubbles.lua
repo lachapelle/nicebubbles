@@ -2,16 +2,17 @@ local ADDON = "NiceBubbles"
 
 -- Lua API
 local _G = _G
-
 local ipairs = ipairs
 local math_abs = math.abs
 local math_floor = math.floor
 local pairs = pairs
 local select = select
+local tonumber = tonumber
 local tostring = tostring
 
 -- WoW API
 local CreateFrame = _G.CreateFrame
+local GetBuildInfo = _G.GetBuildInfo
 local WorldFrame = _G.WorldFrame
 
 -- Bubble Data
@@ -27,9 +28,8 @@ local TOOLTIP_BORDER = [[Interface\Tooltips\UI-Tooltip-Border]]
 
 -- Client version constant
 -- Patch versions: http://wow.gamepedia.com/Public_client_builds
--- 24015 - most recent 7.2.0
--- 23436 - oldest 7.2.0
-local ENGINE_LEGION = tonumber((select(2, GetBuildInfo()))) >= 23436
+local ENGINE_LEGION_725 = tonumber((select(2, GetBuildInfo()))) >= 24461
+local ENGINE_LEGION_720 = tonumber((select(2, GetBuildInfo()))) >= 23436 -- 24015
 
 ------------------------------------------------------------------------------
 -- 	Utitlity Functions
@@ -68,14 +68,18 @@ local Updater = CreateFrame("Frame", nil, WorldFrame) -- this needs to run even 
 Updater:SetFrameStrata("TOOLTIP") -- higher strata is called last
 
 -- check whether the given frame is a bubble or not
-Updater.IsBubble = function(self, bubble)
-	-- Friendly NPC nameplates in instances can't be touched at all, 
-	-- even calling their standard frame methods will cause a taint and error. 
-	-- So to avoid that, we have to avoid calling methods on anything that
-	-- potentially could be a Legion nameplate. 
-	if ENGINE_LEGION and bubble.UnitFrame then
+Updater.IsBubble = ENGINE_LEGION_720 and function(self, bubble)
+	if (bubble.IsForbidden and bubble:IsForbidden()) then
 		return 
 	end
+	local name = bubble.GetName and bubble:GetName()
+	local region = bubble.GetRegions and bubble:GetRegions()
+	if name or not region then 
+		return 
+	end
+	local texture = region.GetTexture and region:GetTexture()
+	return texture and texture == BUBBLE_TEXTURE
+end or function(self, bubble)
 	local name = bubble.GetName and bubble:GetName()
 	local region = bubble.GetRegions and bubble:GetRegions()
 	if name or not region then 
@@ -219,13 +223,36 @@ Updater.UpdateBubbleSize = function(self, bubble)
 	bubbles[bubble].text:SetPoint("BOTTOMLEFT", space, space)
 end
 
-
 local NiceBubbles = CreateFrame("Frame", nil, UIParent)
 NiceBubbles:RegisterEvent("ADDON_LOADED")
 NiceBubbles:RegisterEvent("PLAYER_LOGIN")
+NiceBubbles:RegisterEvent("PLAYER_ENTERING_WORLD")
 NiceBubbles:SetScript("OnEvent", function(self, event, ...) 
 	local addon = ...
-	if event == "ADDON_LOADED" and addon == ADDON then
+	if (event == "PLAYER_ENTERING_WORLD") then
+
+		-- Just kill off the chat bubbles within instances in 7.2.5, 
+		-- as these have become forbidden to change.  
+		-- The original Blizzard bubbles are screen covering spam, and suck.
+		if ENGINE_LEGION_725 then
+			local _, instanceType = IsInInstance()
+			if (instanceType == "none") then
+				SetCVar("chatBubbles", 1)
+				self.Updater:SetScript("OnUpdate", self.Updater.OnUpdate)
+			else
+				self.Updater:SetScript("OnUpdate", nil)
+				SetCVar("chatBubbles", 0)
+				for bubble in pairs(bubbles) do
+					bubbles[bubble]:Hide()
+				end
+			end
+		else
+			-- You're not using this addon if you want to hide them
+			SetCVar("chatBubbles", 1)
+		end
+	
+	elseif (event == "ADDON_LOADED") and (addon == ADDON) then
+
 		-- this will be our bubble parent
 		self.BubbleBox = CreateFrame("Frame", nil, UIParent)
 		self.BubbleBox:SetAllPoints()
@@ -234,7 +261,7 @@ NiceBubbles:SetScript("OnEvent", function(self, event, ...)
 		-- give the updater a reference to the bubble parent
 		self.Updater = Updater
 		self.Updater.BubbleBox = self.BubbleBox
-		
+
 		hooksecurefunc(ChatFrame1, "SetFont", function() 
 			local _, newsize = ChatFrame1:GetFont()
 			newsize = min(max(newsize - 1, minsize), maxsize)
@@ -248,7 +275,7 @@ NiceBubbles:SetScript("OnEvent", function(self, event, ...)
 
 		self:UnregisterEvent("ADDON_LOADED")
 		
-	elseif event == "PLAYER_LOGIN" then
+	elseif (event == "PLAYER_LOGIN") then
 
 		self.Updater:SetScript("OnUpdate", self.Updater.OnUpdate)
 		self.BubbleBox:Show()

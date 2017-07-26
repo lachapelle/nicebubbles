@@ -1,6 +1,6 @@
 ## Interface: 70200
 ## Name: NiceBubbles
-## Title: NiceBubbles |cff666666(WoW 2.4.3 - 7.2.0)|r
+## Title: NiceBubbles |cff666666(WoW 2.4.3 - 7.3.0)|r
 ## Notes: |cff666666By Lars Norberg|r |n|n|cff4488ffPayPal|r|cffffffff:|r |n|cffffffffpaypal@cogwerkz.org|r |n|n|cff4488ffPayPal.Me|r|cffffffff:|r|n|cffffffffwww.paypal.me/larsnorberg|r
 ## Author: Lars Norberg
 ## Version: 1.0

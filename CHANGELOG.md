@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.4] 2017-07-26
+### Fixed
+- Updated to work with Legion patch 7.2.5.
+
+### Changed
+- Disables chat bubbles while in an instance in Legion client patch 7.2.5 or higher.
+
 ## [1.0.3] 2017-05-20
 ### Changed
 - Added TBC patch 2.4.3 compatibility.
