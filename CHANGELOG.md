@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.5] 2017-08-29
+### Changed
+- Bumped the toc version to patch 7.3.0.
+
 ## [1.0.4] 2017-07-26
 ### Fixed
 - Updated to work with Legion patch 7.2.5.
